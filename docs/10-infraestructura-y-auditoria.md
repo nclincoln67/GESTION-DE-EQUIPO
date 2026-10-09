@@ -17,7 +17,7 @@ Auditoría inicial: 8 de octubre de 2026, America/Lima. La arquitectura elegida 
 | URL pública de API | `https://tvzkgolvgfwyjomqihgb.supabase.co` |
 | Cuenta Cloudflare | `cnlincoln` — ID `6229ee9bf9f247c10e161c35762af2f5` |
 | Cloudflare Pages | `gestion-de-equipo` — ID `299247c5-e92a-41fb-ad87-f03f2bd18e87` |
-| Dirección de preparación | `https://gestion-de-equipo.pages.dev` (comprobar despliegue) |
+| Dirección de preparación | `https://gestion-de-equipo.pages.dev`, HTTPS y respuesta 200 comprobados |
 
 Conservar estos recursos existentes. No crear otro repositorio ni otro proyecto Supabase. `LANDING/` es independiente y no se incluye en este repositorio. La numeración 01 identifica este proyecto; los nombres históricos se mantienen durante la preparación para evitar cambios de ubicación innecesarios.
 
@@ -62,6 +62,8 @@ El inventario inicial no tenía Pages ni Workers. Se creó un único proyecto Pa
 
 La carpeta `deploy/preflight/` contiene solo una página de preparación y cabeceras de seguridad para comprobar la conexión GitHub → Cloudflare. No publica la interfaz antigua con un backend ausente ni expone archivos del servidor. Configuración confirmada: fuente GitHub `nclincoln67/GESTION-DE-EQUIPO`, rama `main`, despliegues de producción habilitados, previews deshabilitados, sin comando de build y salida `deploy/preflight`. No tiene variables de entorno ni funciones añadidas. El acceso de la aplicación y su conexión Supabase no se dan por implementados por publicar esta página.
 
+Comprobación real: el commit `a26617d2d48658c2aaadbad23a745276d50b5341` produjo el despliegue `1965b136-7d1f-4276-9d3a-fa3866ad30f4` con disparador `github:push`, rama `main`, y etapa final `deploy: success`. No se hizo una subida manual de archivos a Cloudflare. La URL principal responde 200 con la página esperada y cabeceras CSP restrictiva, X-Frame-Options DENY y X-Robots-Tag noindex/nofollow. Estas cabeceras no sustituyen autorización para los futuros datos privados.
+
 ## Límites Free comprobados en documentación oficial
 
 - Supabase: dos proyectos Free activos, contados entre organizaciones donde el usuario es Owner/Administrator; 500 MB de base por proyecto, 1 GB de Storage, 50.000 usuarios activos mensuales y 500.000 invocaciones Edge Functions. Los proyectos inactivos pueden pausarse y el plan no incluye respaldos automáticos disponibles como en planes de pago.
@@ -77,8 +79,9 @@ Dedicar `Proyecto_01` a Gestión de Equipo. Evaluar el segundo proyecto Free cua
 ## Pendientes antes de desarrollar nuevas funciones
 
 - Iniciar sesión de Git en la PC para verificar `git push` nativo. Commit, subida por conexión GitHub, fetch/pull y correspondencia de archivos ya están comprobados.
-- Comprobar un despliegue automático real de la página de preparación tras el siguiente commit de GitHub; la conexión Cloudflare ya está configurada.
 - Cerrar registro público Auth; confirmar Site URL, redirecciones, correo y recuperación de cuenta. No crear usuarios ni cambiar contraseñas durante la auditoría.
 - Confirmar plan y consumo desde los paneles cuando la API no permita leerlos.
 - Preparar un respaldo/restauración Supabase independiente; no reutilizar el respaldo SQLite como respaldo Postgres.
 - Después de cerrar la auditoría, migrar autenticación y almacenamiento de la aplicación conservando su contrato financiero y pruebas.
+
+La publicación automática ya está verificada. El panel web de Supabase redirige a inicio de sesión; no se intentó introducir credenciales ni alterar seguridad desde el navegador. El cierre completo de la preparación depende de los pasos de acceso descritos en `docs/11-pasos-pendientes-de-acceso.md`. Los cambios finales de documentación se guardan en GitHub y se sincronizan localmente por pull; consultar el historial para el último commit, no tomar el commit inicial como el estado actual.
