@@ -10,18 +10,23 @@ Auditoría inicial: 8 de octubre de 2026, America/Lima. La arquitectura elegida 
 | Carpeta local | `GESTION-DE-EQUIPO/` dentro de `01.  INKAJUS/` |
 | GitHub | `nclincoln67/GESTION-DE-EQUIPO` — ID `1399201211` |
 | Visibilidad | Público, confirmado expresamente por el usuario el 8 de octubre |
-| Rama principal prevista | `main` |
+| Rama principal | `main`, con seguimiento de `origin/main` |
 | Organización Supabase | `cnLincoln` — ID `vmdiapoteggrumahxzee` |
 | Proyecto Supabase | `Proyecto_01` — ref `tvzkgolvgfwyjomqihgb`, confirmado por el usuario |
 | Región Supabase | `us-west-2` |
 | URL pública de API | `https://tvzkgolvgfwyjomqihgb.supabase.co` |
 | Cuenta Cloudflare | `cnlincoln` — ID `6229ee9bf9f247c10e161c35762af2f5` |
+| Cloudflare Pages | `gestion-de-equipo` — ID `299247c5-e92a-41fb-ad87-f03f2bd18e87` |
+| Dirección de preparación | `https://gestion-de-equipo.pages.dev` (comprobar despliegue) |
 
 Conservar estos recursos existentes. No crear otro repositorio ni otro proyecto Supabase. `LANDING/` es independiente y no se incluye en este repositorio. La numeración 01 identifica este proyecto; los nombres históricos se mantienen durante la preparación para evitar cambios de ubicación innecesarios.
 
 ## Auditoría local y GitHub
 
 - Al comenzar, el repositorio remoto no tenía ramas ni commits, y la carpeta local no era un repositorio Git. La conexión Git de lectura se comprobó.
+- Se inicializó Git solo en la carpeta de esta aplicación, con `origin` apuntando al repositorio confirmado. El código verificado se guardó mediante la conexión GitHub de esta conversación; después `fetch` y `pull --ff-only` dejaron local y remoto en el mismo commit `8f8c1fb0a1eeee1c4cf8c3f6ce26ee28e37fe8c0`, con árbol idéntico. El commit local inicial redundante se integró sin cambiar archivos.
+- La subida autenticada funciona mediante la conexión GitHub, pero `git push` desde esta computadora no funciona todavía: falta iniciar sesión en Git Credential Manager. No se copian tokens al repositorio para resolverlo. Configurar ese acceso antes de depender de subidas manuales desde la PC.
+- Pasaron 65 pruebas de lógica/interfaz y 12 de integración HTTP con bases temporales. No se modificó la base real.
 - `.gitignore` ya excluía SQLite, almacenamiento, respaldos y `.env`; se añadieron secretos locales de Cloudflare, archivos privados de claves, exportaciones y archivos temporales de Supabase.
 - La búsqueda inicial de patrones de tokens privados y claves no encontró coincidencias en el código. Esto no sustituye revisar cada archivo que se vaya a publicar.
 - La base SQLite local tiene una cuenta y una entrada de auditoría; no contiene trabajadores, movimientos ni pagos. No se copia a GitHub ni se migra durante esta auditoría.
@@ -53,9 +58,9 @@ Verificación: anon y authenticated no ejecutan la función; authenticated no ti
 
 ## Cloudflare y publicación de comprobación
 
-El inventario inicial no tiene Pages ni Workers. La API permite revisar estos recursos, pero la consulta de suscripciones devuelve un error de autorización; no se puede confirmar facturación desde esta conexión. No se cambia de plan.
+El inventario inicial no tenía Pages ni Workers. Se creó un único proyecto Pages `gestion-de-equipo` conectado al repositorio confirmado. La API permite revisar estos recursos, pero la consulta de suscripciones devuelve un error de autorización; no se puede confirmar facturación desde esta conexión. No se cambia de plan.
 
-La carpeta `deploy/preflight/` contiene solo una página de preparación y cabeceras de seguridad para comprobar la conexión GitHub → Cloudflare. No publica la interfaz antigua con un backend ausente ni expone archivos del servidor. Configuración prevista: rama `main`, sin comando de build y salida `deploy/preflight`. El acceso de la aplicación y su conexión Supabase no se dan por implementados por publicar esta página.
+La carpeta `deploy/preflight/` contiene solo una página de preparación y cabeceras de seguridad para comprobar la conexión GitHub → Cloudflare. No publica la interfaz antigua con un backend ausente ni expone archivos del servidor. Configuración confirmada: fuente GitHub `nclincoln67/GESTION-DE-EQUIPO`, rama `main`, despliegues de producción habilitados, previews deshabilitados, sin comando de build y salida `deploy/preflight`. No tiene variables de entorno ni funciones añadidas. El acceso de la aplicación y su conexión Supabase no se dan por implementados por publicar esta página.
 
 ## Límites Free comprobados en documentación oficial
 
@@ -71,8 +76,8 @@ Dedicar `Proyecto_01` a Gestión de Equipo. Evaluar el segundo proyecto Free cua
 
 ## Pendientes antes de desarrollar nuevas funciones
 
-- Completar y verificar commit/push/pull y la correspondencia local-remota.
-- Conectar GitHub con Cloudflare y comprobar un despliegue automático real de la página de preparación.
+- Iniciar sesión de Git en la PC para verificar `git push` nativo. Commit, subida por conexión GitHub, fetch/pull y correspondencia de archivos ya están comprobados.
+- Comprobar un despliegue automático real de la página de preparación tras el siguiente commit de GitHub; la conexión Cloudflare ya está configurada.
 - Cerrar registro público Auth; confirmar Site URL, redirecciones, correo y recuperación de cuenta. No crear usuarios ni cambiar contraseñas durante la auditoría.
 - Confirmar plan y consumo desde los paneles cuando la API no permita leerlos.
 - Preparar un respaldo/restauración Supabase independiente; no reutilizar el respaldo SQLite como respaldo Postgres.
