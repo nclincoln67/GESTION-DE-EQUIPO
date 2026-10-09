@@ -1,0 +1,15 @@
+{
+  "name": "inkajus-gestion-equipo",
+  "version": "1.0.0-rc.1",
+  "private": true,
+  "description": "Gestión local de equipo, pagos y asistencia de INKAJUS",
+  "scripts": {
+    "start": "node server/index.cjs",
+    "test": "node tests/smoke.cjs && node tests/server.cjs",
+    "verify": "node scripts/verify.cjs",
+    "backup": "node scripts/backup.cjs"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

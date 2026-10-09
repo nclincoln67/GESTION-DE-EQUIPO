@@ -1,0 +1,6 @@
+@echo off
+setlocal
+cd /d "%~dp0"
+powershell -NoProfile -Command "$ErrorActionPreference='Stop'; $root=Get-Location; $nodeCommand=Get-Command node -ErrorAction SilentlyContinue; if($nodeCommand){$node=$nodeCommand.Source}else{$node=Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe'}; if(-not(Test-Path -LiteralPath $node)){throw 'Necesitas Node.js 24 o superior para iniciar INKAJUS.'}; $running=$false; try{$health=Invoke-RestMethod 'http://localhost:8787/api/health' -TimeoutSec 2; $running=$health.application -eq 'INKAJUS'}catch{}; if(-not $running){New-Item -ItemType Directory -Path (Join-Path $root 'storage') -Force | Out-Null; $process=Start-Process -FilePath $node -ArgumentList 'server/index.cjs' -WorkingDirectory $root -WindowStyle Hidden -RedirectStandardOutput (Join-Path $root 'storage\server.log') -RedirectStandardError (Join-Path $root 'storage\server-error.log') -PassThru; for($attempt=0;$attempt -lt 30;$attempt++){Start-Sleep -Milliseconds 300; try{$health=Invoke-RestMethod 'http://localhost:8787/api/health' -TimeoutSec 1; if($health.application -eq 'INKAJUS'){$running=$true;break}}catch{}; if($process.HasExited){break}}}; if(-not $running){throw 'No se pudo iniciar. Revisa storage/server-error.log.'}; Start-Process 'http://localhost:8787'"
+if errorlevel 1 pause
+endlocal
