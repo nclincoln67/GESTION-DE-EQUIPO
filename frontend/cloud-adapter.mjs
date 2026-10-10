@@ -1,6 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { installCloudAdapter } from './connection.mjs';
 const G=window.GE;
+// La fecha del negocio no depende de la zona horaria del dispositivo que entra.
+G.utils.today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Lima',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+G.state.month=G.utils.month();
 const config=G.cloudConfig;
 const link=new URLSearchParams(location.hash.slice(1));
 const type=link.get('type');
