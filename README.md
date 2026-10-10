@@ -2,7 +2,7 @@
 
 Aplicación local de INKAJUS: equipo, pagos, movimientos, asistencia y cuentas con permisos. Esta versión funcional utiliza un servidor local y una base de datos SQLite, separados de la interfaz. Todavía funciona únicamente de forma local; la página publicada en Internet es de preparación.
 
-La arquitectura elegida para Internet es **GitHub → Cloudflare Pages**, con **Supabase independiente** para datos y autenticación. Estamos en la etapa de auditoría y preparación: [la página de preparación](https://gestion-de-equipo.pages.dev) comprueba la conexión, no publica todavía la aplicación funcional. Consulta el estado y los recursos en [Infraestructura y auditoría](docs/10-infraestructura-y-auditoria.md) y los [pasos pendientes](docs/11-pasos-pendientes-de-acceso.md). Las instrucciones antiguas de hosting Node/SQLite son referencia histórica, no el nuevo plan de publicación.
+La arquitectura elegida para Internet es **GitHub → Cloudflare Pages**, con **Supabase independiente** para datos y autenticación. Ya se inició la [integración del backend](docs/12-integracion-supabase.md): [la página de preparación](https://gestion-de-equipo.pages.dev) sigue comprobando la publicación, no es todavía la aplicación funcional. Consulta los recursos en [Infraestructura y auditoría](docs/10-infraestructura-y-auditoria.md). Las instrucciones antiguas de hosting Node/SQLite son referencia histórica, no el nuevo plan de publicación.
 
 ## Abrir
 

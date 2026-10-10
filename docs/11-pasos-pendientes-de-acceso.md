@@ -2,6 +2,8 @@
 
 Proyecto activo: 01 — Gestión de Equipo de INKAJUS. La aplicación funcional sigue local; `https://gestion-de-equipo.pages.dev` muestra únicamente preparación. No introducir pagos reales en esa página ni asumir que la cuenta local ya existe en Supabase.
 
+Actualización del 9 de octubre: Git autenticado y sincronizado comprobados; registro libre de Supabase desactivado comprobado; Cloudflare Free confirmado por el usuario. Los pasos 1–3 se conservan como referencia, no para repetirlos. La integración ya comenzó: ver `docs/12-integracion-supabase.md` para el estado actual y los pendientes reales.
+
 ## 1. Acceso de Git desde la computadora
 
 El repositorio ya contiene el código y la carpeta local está conectada a `origin/main`. La conexión GitHub de esta conversación puede subir cambios; Git de Windows todavía no tiene acceso autenticado para hacer `push`.

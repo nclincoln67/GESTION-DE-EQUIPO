@@ -2,6 +2,8 @@
 
 Auditoría inicial: 8 de octubre de 2026, America/Lima. La arquitectura elegida es GitHub → Cloudflare para frontend, y Supabase como backend independiente. No se conecta Supabase a GitHub. La versión Node/SQLite local permanece como referencia; todavía no está migrada a Supabase.
 
+Actualización del 9 de octubre: el acceso Git de la PC ya pasó la prueba de push simulado, local y remoto coinciden; el registro público de Supabase se comprobó desactivado, y el usuario confirmó Cloudflare Free desde su panel. Se inició la integración por su indicación expresa. El consumo mensual de facturación que las conexiones no exponen sigue sin verificarse automáticamente. La sección inicial de inventario de este documento conserva el estado encontrado originalmente; para los nuevos recursos y pendientes, consultar `docs/12-integracion-supabase.md`.
+
 ## Identidad de los recursos
 
 | Recurso | Identidad verificada |

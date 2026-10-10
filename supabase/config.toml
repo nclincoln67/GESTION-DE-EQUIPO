@@ -1,0 +1,5 @@
+project_id = "inkajus-gestion-equipo"
+
+[functions.team-api]
+verify_jwt = true
+entrypoint = "./functions/team-api/index.ts"

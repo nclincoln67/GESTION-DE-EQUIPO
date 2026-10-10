@@ -23,3 +23,4 @@ credentials/
 *.key
 *.p12
 *.pfx
+supabase/functions/team-api/generated/
