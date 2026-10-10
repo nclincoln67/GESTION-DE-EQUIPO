@@ -26,7 +26,7 @@ try {
   console.log(`Sintaxis y recursos locales correctos: ${scripts.length} archivos JavaScript.`);
   const build = spawnSync(process.execPath, [path.join(root, 'scripts', 'build-cloud-domain.cjs')], { cwd: root, stdio: 'inherit' });
   if (build.status !== 0) throw new Error('No se pudieron generar las reglas de nube.');
-  for (const suite of ['smoke.cjs', 'server.cjs', 'cloud.mjs']) {
+  for (const suite of ['smoke.cjs', 'server.cjs', 'cloud.mjs', 'cloud-auth.mjs']) {
   const result = spawnSync(process.execPath, [path.join(root, 'tests', suite)], {
     cwd: root,
     stdio: 'inherit',

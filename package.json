@@ -7,7 +7,14 @@
     "start": "node server/index.cjs",
     "test": "node tests/smoke.cjs && node tests/server.cjs",
     "verify": "node scripts/verify.cjs",
+    "build": "node scripts/build-frontend.cjs",
     "backup": "node scripts/backup.cjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.3"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
   },
   "engines": {
     "node": ">=24"

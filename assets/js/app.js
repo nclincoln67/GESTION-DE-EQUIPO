@@ -25,6 +25,7 @@
       G.state.page=page;G.state.tab=tab||({payments:'summary',attendance:'calendar',settings:'company'}[page]||'');G.state.profileId=null;G.state.profileTab='information';G.state.filters={};this.render();
     },
     loginView() {
+      if(G.cloudMode)return G.cloudUI.login();
       if(G.serverMode&&G.setupRequired)return this.setupView();
       document.getElementById('app').innerHTML=`<main class="login-page"><section class="login-story"><div class="brand"><img src="assets/icons/brand.svg" alt=""><div><strong>INKAJUS</strong><small>GESTIÓN DE EQUIPO</small></div></div><div class="story-body"><span class="eyebrow">PERSONAS · PAGOS · ORGANIZACIÓN</span><h1>Un equipo que avanza.<br><span>Todo en su lugar.</span></h1><p>Un espacio para cuidar a tu equipo y mantener claros sus pagos, descansos y movimientos.</p><div class="story-summary"><div><strong>05</strong><small>Módulos conectados</small></div><div><strong>01</strong><small>Espacio para tu equipo</small></div></div></div><p class="story-footer">Pequeños equipos. Una gestión más clara.</p></section><section class="login-main"><div class="login-form"><span class="eyebrow">BIENVENIDO A TU ESPACIO</span><h2>Inicia sesión</h2><p>Ingresa con tu usuario y contraseña.</p><form id="login-form"><div class="form-grid">${B.field('username','Usuario','',{required:true,wide:true})}${B.field('password','Contraseña','',{type:'password',required:true,wide:true})}</div><div class="form-error" id="login-error" role="alert" style="padding:14px 0 0"></div><button type="submit" class="btn btn-primary">${I('lock')}Entrar a mi espacio</button></form>${G.serverMode?'<div class="login-foot">Tu cuenta de INKAJUS te permite consultar la información correspondiente a tu perfil.</div>':`<div class="login-foot"><strong>Explora la demostración</strong><div class="demo-accounts"><button type="button" data-action="demo-login" data-id="admin">Administrador</button><button type="button" data-action="demo-login" data-id="valeria">Visitante</button></div><p class="demo-details">admin / admin123 · admin2 / admin123<br>valeria / visita123</p><p style="margin-top:13px">Prototipo local con datos ficticios. El acceso es una simulación; usa únicamente contraseñas de prueba.</p></div>`}</div></section></main>`;
       document.querySelector('#f-username').autocomplete='username';document.querySelector('#f-password').autocomplete='current-password';
@@ -36,7 +37,7 @@
       };
     },
     render() {
-      const user=G.auth.current();if(!user)return this.loginView();
+      const user=G.auth.current();if(!user||G.authAction)return this.loginView();
       if(!G.auth.isAdmin()&&G.state.page==='settings')G.state.page='home';
       const d=G.auth.data(),page=G.state.page,title=pages.find(p=>p[0]===page)[1];
       const body=G.views[page]();
@@ -50,6 +51,7 @@
     action(button) {
       const {action,id,collection,page,type,period,tab}=button.dataset;
       const closeAnd=fn=>{B.close();fn();};
+      if(G.cloudMode&&G.cloudUI.action(button))return;
       switch(action) {
         case 'close-dialog': B.close();break;
         case 'toggle-password': {const field=document.getElementById(id),show=field.type==='password';field.type=show?'text':'password';button.textContent=show?'Ocultar':'Mostrar';button.ariaLabel=show?'Ocultar contraseña':'Mostrar contraseña';button.ariaPressed=String(show);break;}

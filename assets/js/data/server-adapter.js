@@ -1,7 +1,7 @@
 (function (G) {
   'use strict';
   // El archivo local sigue disponible para consultar/exportar el prototipo anterior.
-  if (!globalThis.location || !/^https?:$/.test(location.protocol)) return;
+  if (G.cloudMode || !globalThis.location || !/^https?:$/.test(location.protocol)) return;
 
   G.serverMode = true;
   let data = null, user = null, revision = 0;
