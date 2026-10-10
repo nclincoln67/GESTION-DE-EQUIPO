@@ -28,6 +28,8 @@ URL de sitio: `https://gestion-de-equipo.pages.dev`. Retorno exacto autorizado: 
 
 ## Cambios y pruebas
 
+Publicación verificada: el push `d15a665e798808193eb3a469476365e657a337d6` generó el despliegue automático `e67fbc52-783c-4139-9555-f543aed88242`, con compilación y publicación correctas. La web mostró «Correo o usuario» y rechazó credenciales ficticias por HTTPS en un navegador real. Se añade `404.html` explícito para que las rutas inexistentes no respondan con el fallback de la aplicación.
+
 - Migración remota separada: `20261010021437_team_login_and_accounts`. Sus definiciones están en `supabase/schema/team-login.sql` y `team-accounts.sql`, sin datos privados. No ejecutarlas de nuevo sobre recursos ya existentes.
 - `team-api` versión 2, `team-login` versión 1. Antes de invitar al primer usuario, comprobar el despliegue del frontend, no solo su configuración.
 - `node scripts/verify.cjs`: 65 regresiones del dominio local, 12 integraciones Node/SQLite, suites de reglas/Edge y de login/adaptador/cuentas.

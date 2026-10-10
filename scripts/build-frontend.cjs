@@ -8,7 +8,7 @@ html=html.replace('  <script src="assets/js/app.js"></script>',
   '  <script src="assets/js/cloud-config.js"></script>\n  <script src="assets/js/cloud-adapter.js"></script>\n  <script src="assets/js/app.js"></script>');
 const resources=[...html.matchAll(/(?:src|href)="(assets\/[^"?#]+)"/g)].map(m=>m[1]);
 const generated=new Set(['assets/js/cloud-config.js','assets/js/cloud-adapter.js']);
-const planned=['index.html','_headers',...resources,'assets/js/cloud-adapter.js.LEGAL.txt'];
+const planned=['index.html','404.html','_headers',...resources,'assets/js/cloud-adapter.js.LEGAL.txt'];
 // Comprobar el contenido de dist existente; no sobrescribir archivos ajenos a esta salida.
 function inventory(dir){return fs.existsSync(dir)?fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?inventory(path.join(dir,e.name)):[path.relative(out,path.join(dir,e.name)).replaceAll('\\','/')]):[];}
 for(const file of inventory(out))if(!planned.includes(file))throw new Error('Archivo inesperado en dist: '+file);
@@ -17,6 +17,7 @@ for(const file of resources){if(generated.has(file))continue;
   const target=path.join(out,file);fs.mkdirSync(path.dirname(target),{recursive:true});fs.copyFileSync(path.join(root,file),target);}
 // Los iconos son recursos de interfaz, no documentos operativos.
 fs.writeFileSync(path.join(out,'index.html'),html);
+fs.writeFileSync(path.join(out,'404.html'),'<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>INKAJUS · Página no disponible</title><link rel="stylesheet" href="/assets/css/tokens.css"><link rel="stylesheet" href="/assets/css/layout.css"><body><main class="startup"><h1>Esta página no está disponible</h1><p>Utiliza el acceso principal de Gestión de Equipo.</p><a href="/">Volver a INKAJUS</a></main></body></html>');
 const config=JSON.parse(fs.readFileSync(path.join(root,'frontend/public-config.json'),'utf8'));
 if(config.url!=='https://tvzkgolvgfwyjomqihgb.supabase.co'||!config.publishableKey?.startsWith('sb_publishable_'))throw new Error('Configuración pública inválida.');
 fs.writeFileSync(path.join(out,'assets/js/cloud-config.js'),'window.GE.cloudConfig='+JSON.stringify(config)+';\n');

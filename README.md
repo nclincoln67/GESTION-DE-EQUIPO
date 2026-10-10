@@ -1,8 +1,12 @@
 # INKAJUS · Gestión de equipo
 
-Aplicación local de INKAJUS: equipo, pagos, movimientos, asistencia y cuentas con permisos. Esta versión funcional utiliza un servidor local y una base de datos SQLite, separados de la interfaz. Todavía funciona únicamente de forma local; la página publicada en Internet es de preparación.
+Aplicación de INKAJUS: equipo, pagos, movimientos, asistencia y cuentas con permisos. La versión local Node/SQLite se conserva como referencia. La interfaz cloud ya está publicada y conectada a Supabase; faltan la activación inicial y las comprobaciones con cuentas reales antes de registrar pagos de uso real.
 
-La arquitectura elegida para Internet es **GitHub → Cloudflare Pages**, con **Supabase independiente** para datos y autenticación. Ya se inició la [integración del backend](docs/12-integracion-supabase.md): [la página de preparación](https://gestion-de-equipo.pages.dev) sigue comprobando la publicación, no es todavía la aplicación funcional. Consulta los recursos en [Infraestructura y auditoría](docs/10-infraestructura-y-auditoria.md). Las instrucciones antiguas de hosting Node/SQLite son referencia histórica, no el nuevo plan de publicación.
+La arquitectura es **GitHub → Cloudflare Pages**, con **Supabase independiente** para datos y autenticación. [Abrir la interfaz cloud](https://gestion-de-equipo.pages.dev). El [acceso y la publicación](docs/13-acceso-y-publicacion.md) describen la conexión, las invitaciones y lo pendiente. Consulta los recursos en [Infraestructura y auditoría](docs/10-infraestructura-y-auditoria.md). Las instrucciones antiguas de hosting Node/SQLite son referencia histórica, no el nuevo plan de publicación.
+
+## Compilar el frontend cloud
+
+Instala las versiones fijadas en `pnpm-lock.yaml` con `pnpm install --frozen-lockfile` y ejecuta `pnpm build`. Solo se publica `dist/`; jamás la raíz del repositorio. Cloudflare compila automáticamente tras un push a `main`. La compilación no ejecuta SQL ni migra bases de datos. El cliente de Supabase y el compilador solo son necesarios para la salida cloud; el servidor local continúa sin dependencias externas.
 
 ## Abrir
 

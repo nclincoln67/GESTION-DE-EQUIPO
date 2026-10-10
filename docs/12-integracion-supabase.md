@@ -34,7 +34,9 @@ No es una carpeta de archivos con pagos, ni almacenamiento en el navegador. La b
 - Asesor de seguridad: sin avisos tras las políticas explícitas.
 - Estado posterior: cero usuarios Auth, cero miembros activos, cero trabajadores/pagos, una preautorización privada y revisión 0. La base local y su contraseña no fueron borradas ni copiadas a Auth.
 
-## Pendiente — no dar por terminado
+## Pendiente al cerrar esta primera etapa — historial
+
+La continuación en [13-acceso-y-publicacion.md](13-acceso-y-publicacion.md) sustituye este inventario: ya se implementaron el frontend, el login y la gestión de cuentas. Se conserva aquí la lista histórica, no como estado actual.
 
 1. Conectar el frontend a Supabase Auth: activación, login, renovación, cierre y recuperación; conservar `cnlincoln` como identificador sin publicar su correo como una tabla de consulta libre.
 2. Implementar gestión administrativa de cuentas Auth, roles y vínculos. Por seguridad `team-api` todavía rechaza saveUser/toggleUser/deleteUser con 501; no utiliza las contraseñas del prototipo.
