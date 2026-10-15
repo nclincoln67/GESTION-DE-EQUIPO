@@ -37,9 +37,8 @@ async function verifyToken(token: string) {
 
 Deno.serve(createHandler({
   verifyToken,
-  load: (actor: {userId: string; sessionId: string}) => rpc('team_backend_load', { p_actor: actor.userId, p_session: actor.sessionId }),
-  save: (actor: {userId: string; sessionId: string}, revision: number, state: unknown) => rpc('team_backend_save', { p_actor: actor.userId, p_session: actor.sessionId, p_revision: revision, p_state: state }),
-  accounts: (actor: {userId:string;sessionId:string})=>rpc('team_accounts_list',{p_actor:actor.userId,p_session:actor.sessionId}),
+  load: (actor: {userId: string; sessionId: string}, includeAccounts = true) => rpc(includeAccounts ? 'team_backend_snapshot' : 'team_backend_load', { p_actor: actor.userId, p_session: actor.sessionId }),
+  commit: (actor: {userId: string; sessionId: string}, revision: number, state: unknown) => rpc('team_backend_commit', { p_actor: actor.userId, p_session: actor.sessionId, p_revision: revision, p_state: state }),
   async changeAccount(actor:{userId:string;sessionId:string},revision:number,action:string,input:unknown,target:string|null){
     const result=await rpc('team_account_change',{p_actor:actor.userId,p_session:actor.sessionId,p_revision:revision,p_action:action,p_input:input,p_target:target});
     if(!result.email)return {};

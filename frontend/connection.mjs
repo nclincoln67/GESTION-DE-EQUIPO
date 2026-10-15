@@ -1,8 +1,9 @@
 // Adaptador comprobable sin navegador, SDK ni credenciales reales.
 export function installCloudAdapter(G,client,config,fetcher=fetch){
   G.cloudMode=true;G.serverMode=true;G.cloudAccounts=[];
-  let data=null,user=null,revision=0,queue=Promise.resolve();
-  G.clearCloudData=()=>{data=null;user=null;revision=0;G.cloudAccounts=[];};
+  let data=null,user=null,revision=0,queue=Promise.resolve(),refreshing=null,epoch=0;
+  const endpoint=name=>config.url+'/functions/v1/'+name+(config.functionRegion?'?forceFunctionRegion='+encodeURIComponent(config.functionRegion):'');
+  G.clearCloudData=()=>{epoch++;data=null;user=null;revision=0;G.cloudAccounts=[];};
   const apply=result=>{if(Object.hasOwn(result,'data'))data=result.data;
     if(Object.hasOwn(result,'user'))user=result.user;
     if(Object.hasOwn(result,'revision'))revision=result.revision;
@@ -11,21 +12,28 @@ export function installCloudAdapter(G,client,config,fetcher=fetch){
     return result;
   };
   async function api(payload){
+    const requestEpoch=epoch;
     const {data:authData,error}=await client.auth.getSession();
+    if(requestEpoch!==epoch)throw new Error('La sesión cambió. Vuelve a intentar.');
     if(error||!authData.session){G.clearCloudData();throw new Error('Tu sesión terminó. Inicia sesión nuevamente.');}
     let response;
-    try{response=await fetcher(config.url+'/functions/v1/team-api',{
+    try{response=await fetcher(endpoint('team-api'),{
       method:payload===undefined?'GET':'POST',headers:{apikey:config.publishableKey,Authorization:'Bearer '+authData.session.access_token,
         ...(payload===undefined?{}:{'Content-Type':'application/json'})},body:payload===undefined?undefined:JSON.stringify(payload)});
     }catch{throw new Error('No se pudo conectar. Comprueba tu conexión a internet.');}
     let result;try{result=await response.json();}catch{throw new Error('El servicio no está disponible. Intenta nuevamente.');}
+    if(requestEpoch!==epoch)throw new Error('La sesión cambió. Vuelve a intentar.');
+    // Una respuesta vieja nunca puede reemplazar una escritura más reciente.
+    if(response.ok && Number.isSafeInteger(result.revision) && result.revision<revision)return result;
     if(response.ok||response.status===409)apply(result);
     if(!response.ok){if([401,403].includes(response.status)){G.clearCloudData();G.app?.render();}
       throw new Error(result.error||'No se pudo completar la operación.');}
     return result;
   }
   const command=(name,args)=>{
-    const operation=queue.then(()=>api({command:name,args,revision}));queue=operation.catch(()=>{});return operation;
+    const commandEpoch=epoch;
+    const operation=queue.then(()=>{if(commandEpoch!==epoch)throw new Error('La sesión cambió. Vuelve a intentar.');return api({command:name,args,revision});});
+    queue=operation.catch(()=>{});return operation;
   };
   G.repo={
     async init(){const {data:authData,error}=await client.auth.getSession();
@@ -42,7 +50,7 @@ export function installCloudAdapter(G,client,config,fetcher=fetch){
   G.auth.data=()=>G.repo.read();
   G.auth.employees=()=>user?G.repo.read().employees.filter(e=>!e.deletedAt):[];
   G.auth.login=async(identifier,password)=>{
-    let response;try{response=await fetcher(config.url+'/functions/v1/team-login',{method:'POST',headers:{apikey:config.publishableKey,'Content-Type':'application/json'},body:JSON.stringify({identifier,password})});}
+    let response;try{response=await fetcher(endpoint('team-login'),{method:'POST',headers:{apikey:config.publishableKey,'Content-Type':'application/json'},body:JSON.stringify({identifier,password})});}
     catch{throw new Error('No se pudo conectar. Comprueba tu conexión a internet.');}
     const result=await response.json();if(!response.ok)throw new Error(result.error||'No se pudo iniciar sesión.');
     const {error}=await client.auth.setSession(result);if(error)throw new Error('No se pudo abrir tu sesión. Intenta nuevamente.');
@@ -50,11 +58,18 @@ export function installCloudAdapter(G,client,config,fetcher=fetch){
     try{return await api();}catch(error){G.clearCloudData();await client.auth.signOut({scope:'local'});throw error;}
   };
   G.auth.logout=async()=>{
-    const {error}=await client.auth.signOut({scope:'local'});G.authAction=null;G.clearCloudData();
+    G.authAction=null;G.clearCloudData();
+    const {error}=await client.auth.signOut({scope:'local'});
     if(error)throw new Error('No se pudo revocar la sesión en el servidor. Reintenta cuando tengas conexión.');
   };
   for(const [service,methods] of Object.entries({records:['saveEmployee','toggleEmployee','deleteEmployee','addMovement','voidRecord','saveEvent','saveUser','toggleUser','deleteUser','saveCompany','saveCatalog','toggleCatalog','deleteCatalog'],payroll:['addPayment','prepare']}))
     for(const method of methods)G[service][method]=(...args)=>command(`${service}.${method}`,args);
   G.sendCloudInvite=id=>command('accounts.invite',[id]);
-  G.refresh=()=>api();
+  // Compartir una lectura en curso y respetar el orden de las escrituras.
+  G.refresh=()=>{
+    if(refreshing)return refreshing;
+    const readEpoch=epoch;
+    const operation=queue.then(()=>{if(readEpoch!==epoch)throw new Error('La sesión cambió. Vuelve a intentar.');return api();});queue=operation.catch(()=>{});
+    refreshing=operation.finally(()=>{refreshing=null;});return refreshing;
+  };
 }

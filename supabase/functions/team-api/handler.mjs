@@ -22,7 +22,7 @@ async function readJSON(request) {
   try { return JSON.parse(new TextDecoder().decode(bytes)); } catch { throw fail(400, 'JSON no válido.'); }
 }
 
-export function createHandler({ verifyToken, load, save, origins, accounts, changeAccount }) {
+export function createHandler({ verifyToken, load, save, commit, origins, accounts, changeAccount }) {
   return async request => {
     const origin = request.headers.get('origin');
     const allowed = !origin || origins.includes(origin);
@@ -32,6 +32,7 @@ export function createHandler({ verifyToken, load, save, origins, accounts, chan
       ...(origin && allowed ? { 'Access-Control-Allow-Origin': origin } : {}),
       'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Max-Age': '600',
     };
     const json = (status, value) => new Response(JSON.stringify(value), { status, headers });
     try {
@@ -42,9 +43,9 @@ export function createHandler({ verifyToken, load, save, origins, accounts, chan
       if (!match) throw fail(401, 'Inicia sesión para continuar.');
       const actor = await verifyToken(match[1]);
       if (!actor?.userId || !actor.sessionId) throw fail(401, 'Tu sesión terminó.');
-      const snapshot = await load(actor);
+      const snapshot = await load(actor, request.method === 'GET');
       if (!snapshot?.user?.active) throw fail(403, 'Esta cuenta no tiene acceso a Gestión de Equipo.');
-      const output = async value => ({...value,...(accounts && value.user.role==='admin'?{accounts:await accounts(actor)}:{})});
+      const output = async value => ({...value,...(accounts && !Object.hasOwn(value,'accounts') && value.user.role==='admin'?{accounts:await accounts(actor)}:{})});
       if (request.method === 'GET') return json(200, await output(snapshot));
       const input = await readJSON(request);
       if (!input || typeof input !== 'object' || Array.isArray(input)) throw fail(400, 'Formulario inválido.');
@@ -74,6 +75,7 @@ export function createHandler({ verifyToken, load, save, origins, accounts, chan
       const next = runtime.data();
       // Las autorizaciones pertenecen a la tabla de miembros, no al JSON editable de negocio.
       next.users = [];
+      if (commit) return json(200, await output(await commit(actor, input.revision, next)));
       await save(actor, input.revision, next);
       return json(200, await output(await load(actor)));
     } catch (error) {

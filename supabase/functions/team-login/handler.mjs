@@ -3,7 +3,7 @@ export function createLoginHandler({ resolve, authenticate, origins }) {
     const origin=request.headers.get('origin'), allowed=!origin||origins.includes(origin);
     const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','Vary':'Origin',
       ...(origin&&allowed?{'Access-Control-Allow-Origin':origin}:{}),
-      'Access-Control-Allow-Headers':'apikey,content-type','Access-Control-Allow-Methods':'POST,OPTIONS'};
+      'Access-Control-Allow-Headers':'apikey,content-type','Access-Control-Allow-Methods':'POST,OPTIONS','Access-Control-Max-Age':'600'};
     const json=(status,body)=>new Response(JSON.stringify(body),{status,headers});
     if(!allowed)return json(403,{error:'Origen no permitido.'});
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers});

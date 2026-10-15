@@ -1,5 +1,9 @@
 # Acceso cloud — continuación del 9 de octubre de 2026
 
+Actualización de rendimiento del 15 de octubre: ver `14-rendimiento.md` para la
+compilación versionada, región de invocación y RPC agrupadas. Las reglas de acceso
+de este documento se mantienen; las versiones de funciones indicadas abajo son históricas.
+
 ## Conexiones distintas
 
 1. GitHub `nclincoln67/GESTION-DE-EQUIPO`, rama `main` → integración Git de Cloudflare Pages `gestion-de-equipo`. Un push dispara la compilación. No utiliza una clave de Supabase ni aplica migraciones SQL.

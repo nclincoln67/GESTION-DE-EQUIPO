@@ -56,7 +56,14 @@
         case 'close-dialog': B.close();break;
         case 'toggle-password': {const field=document.getElementById(id),show=field.type==='password';field.type=show?'text':'password';button.textContent=show?'Ocultar':'Mostrar';button.ariaLabel=show?'Ocultar contraseña':'Mostrar contraseña';button.ariaPressed=String(show);break;}
         case 'export-data': G.exports.download();break;
-        case 'refresh': return B.complete(()=>G.refresh?.(),()=>{this.render();B.toast('Información actualizada.');},error=>B.toast(error.message,true));
+        case 'refresh': {
+          if(this.refreshing)return;
+          this.refreshing=true;const label=button.innerHTML;
+          button.disabled=true;button.textContent='Actualizando…';button.setAttribute('aria-busy','true');
+          return B.complete(()=>G.refresh?.(),()=>{this.refreshing=false;this.render();B.toast('Información actualizada.');},error=>{
+            this.refreshing=false;button.disabled=false;button.innerHTML=label;button.removeAttribute('aria-busy');B.toast(error.message,true);
+          });
+        }
         case 'demo-login': document.getElementById('f-username').value=id;document.getElementById('f-password').value=id==='valeria'?'visita123':'admin123';document.getElementById('f-password').focus();break;
         case 'logout': B.close();return B.complete(()=>G.auth.logout(),()=>this.loginView(),error=>B.toast(error.message,true));
         case 'navigate': this.navigate(page,tab);break;
