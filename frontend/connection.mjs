@@ -65,6 +65,28 @@ export function installCloudAdapter(G,client,config,fetcher=fetch){
   for(const [service,methods] of Object.entries({records:['saveEmployee','toggleEmployee','deleteEmployee','addMovement','voidRecord','saveEvent','saveUser','toggleUser','deleteUser','saveCompany','saveCatalog','toggleCatalog','deleteCatalog'],payroll:['addPayment','prepare']}))
     for(const method of methods)G[service][method]=(...args)=>command(`${service}.${method}`,args);
   G.sendCloudInvite=id=>command('accounts.invite',[id]);
+  // Comprobantes bajo demanda; nunca incluidos en el snapshot financiero ni en caché local.
+  async function receiptRequest(target,extra={},file=null){
+    const requestEpoch=epoch;
+    const {data:sessionData,error}=await client.auth.getSession();
+    if(error||!sessionData.session||requestEpoch!==epoch)throw new Error('Tu sesión terminó. Inicia sesión nuevamente.');
+    const address=new URL(endpoint('team-receipts'));
+    for(const [key,value] of Object.entries({collection:target.collection,record:target.id,...extra}))if(key!=='name')address.searchParams.set(key,value);
+    let response;
+    try{response=await fetcher(address.toString(),{method:file?'POST':'GET',headers:{apikey:config.publishableKey,
+      Authorization:'Bearer '+sessionData.session.access_token,...(file?{'X-File-Name':encodeURIComponent(file.name),'Content-Type':file.type||(/\.pdf$/i.test(file.name)?'application/pdf':/\.png$/i.test(file.name)?'image/png':'image/jpeg')}:{})},body:file||undefined});}
+    catch{throw new Error('No se pudo conectar. Conserva el archivo y reintenta cuando tengas conexión.');}
+    if(requestEpoch!==epoch)throw new Error('La sesión cambió. Vuelve a intentar.');
+    if(!response.ok){let result;try{result=await response.json();}catch{}throw new Error(result?.error||'No se pudo acceder al comprobante.');}
+    const result=extra.id&&!file?await response.blob():await response.json();
+    if(requestEpoch!==epoch)throw new Error('La sesión cambió. Vuelve a intentar.');
+    return result;
+  }
+  G.receipts={
+    list:target=>receiptRequest(target),
+    upload:(target,file,id)=>receiptRequest(target,{id,name:file.name},file),
+    download:(target,id)=>receiptRequest(target,{id}),
+  };
   // Compartir una lectura en curso y respetar el orden de las escrituras.
   G.refresh=()=>{
     if(refreshing)return refreshing;

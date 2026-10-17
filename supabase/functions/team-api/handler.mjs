@@ -75,7 +75,15 @@ export function createHandler({ verifyToken, load, save, commit, origins, accoun
       const next = runtime.data();
       // Las autorizaciones pertenecen a la tabla de miembros, no al JSON editable de negocio.
       next.users = [];
-      if (commit) return json(200, await output(await commit(actor, input.revision, next)));
+      // Referencia exacta creada en este comando; no inferirla en el navegador por fecha o importe.
+      let createdRecord;
+      if (input.command==='payroll.addPayment'||input.command==='records.addMovement') {
+        const payment=next.payments.find(p=>!snapshot.data.payments.some(old=>old.id===p.id));
+        const movement=next.movements.find(m=>!snapshot.data.movements.some(old=>old.id===m.id));
+        if(payment)createdRecord={collection:'payments',id:payment.id};
+        else if(movement)createdRecord={collection:'movements',id:movement.id};
+      }
+      if (commit) return json(200, {...await output(await commit(actor, input.revision, next)),...(createdRecord?{createdRecord}:{})});
       await save(actor, input.revision, next);
       return json(200, await output(await load(actor)));
     } catch (error) {
